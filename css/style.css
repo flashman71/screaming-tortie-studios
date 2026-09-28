@@ -1,0 +1,466 @@
+/* ---------------------------------------------------------
+   Screaming Tortie Studios
+   Initial site design
+   --------------------------------------------------------- */
+
+:root {
+    --background: #0c0d0d;
+    --surface: #151717;
+    --surface-light: #1c1f1f;
+
+    --text: #e5e1d8;
+    --muted: #9b9a94;
+
+    --accent: #b64132;
+    --accent-dark: #702820;
+
+    --border: #353837;
+
+    --max-width: 1100px;
+}
+
+
+/* ---------------------------------------------------------
+   Base
+   --------------------------------------------------------- */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+
+    background:
+        linear-gradient(
+            rgba(12, 13, 13, 0.96),
+            rgba(12, 13, 13, 0.98)
+        );
+
+    color: var(--text);
+
+    font-family:
+        "Courier New",
+        Courier,
+        monospace;
+
+    line-height: 1.6;
+}
+
+
+a {
+    color: var(--text);
+    text-decoration: none;
+
+    border-bottom: 1px solid var(--accent);
+
+    transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+a:hover {
+    color: var(--accent);
+    border-color: var(--text);
+}
+
+
+/* ---------------------------------------------------------
+   Header
+   --------------------------------------------------------- */
+
+.site-header {
+    max-width: var(--max-width);
+
+    margin: 0 auto;
+    padding: 42px 30px 34px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    border-bottom: 1px solid var(--border);
+}
+
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+
+.placeholder-logo {
+    width: 66px;
+    height: 66px;
+
+    display: grid;
+    place-items: center;
+
+    border: 2px solid var(--accent);
+
+    color: var(--accent);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+
+    letter-spacing: -2px;
+}
+
+
+.brand h1 {
+    margin: 0;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    font-size: 1.55rem;
+    font-weight: 900;
+
+    letter-spacing: 0.08em;
+}
+
+
+.studio {
+    margin: 2px 0 0;
+
+    color: var(--muted);
+
+    font-size: 0.8rem;
+    letter-spacing: 0.45em;
+}
+
+
+.tagline {
+    color: var(--muted);
+
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+
+/* ---------------------------------------------------------
+   Main
+   --------------------------------------------------------- */
+
+main {
+    max-width: var(--max-width);
+
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+
+/* ---------------------------------------------------------
+   Hero / Game
+   --------------------------------------------------------- */
+
+.hero {
+    min-height: 570px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 90px 0;
+}
+
+
+.classification,
+.section-label {
+    margin-bottom: 24px;
+
+    color: var(--accent);
+
+    font-size: 0.72rem;
+    font-weight: bold;
+
+    letter-spacing: 0.24em;
+}
+
+
+.game-title {
+    border-left: 5px solid var(--accent);
+
+    padding-left: 25px;
+}
+
+
+.franchise {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 1rem;
+    font-weight: bold;
+
+    letter-spacing: 0.45em;
+}
+
+
+.game-title h2 {
+    margin: 4px 0 0;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    font-size: clamp(2.8rem, 7vw, 6.3rem);
+    font-weight: 900;
+
+    line-height: 0.95;
+
+    letter-spacing: -0.04em;
+}
+
+
+.game-description {
+    max-width: 720px;
+
+    margin: 40px 0 0;
+
+    font-size: 1.2rem;
+}
+
+
+.game-copy {
+    max-width: 680px;
+
+    color: var(--muted);
+
+    font-size: 0.95rem;
+}
+
+
+.status {
+    width: fit-content;
+
+    margin-top: 32px;
+    padding: 10px 15px;
+
+    border: 1px solid var(--accent);
+
+    color: var(--accent);
+
+    font-size: 0.7rem;
+    font-weight: bold;
+
+    letter-spacing: 0.18em;
+}
+
+
+/* ---------------------------------------------------------
+   Intelligence strip
+   --------------------------------------------------------- */
+
+.intel-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+
+.intel-strip div {
+    padding: 25px 20px;
+
+    font-size: 0.75rem;
+
+    border-right: 1px solid var(--border);
+}
+
+
+.intel-strip div:last-child {
+    border-right: none;
+}
+
+
+.intel-strip span {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: var(--muted);
+
+    font-size: 0.62rem;
+
+    letter-spacing: 0.15em;
+}
+
+
+/* ---------------------------------------------------------
+   About
+   --------------------------------------------------------- */
+
+.about,
+.contact {
+    padding: 100px 0;
+
+    border-bottom: 1px solid var(--border);
+}
+
+
+.about {
+    max-width: 780px;
+}
+
+
+.about h2,
+.contact h2 {
+    margin: 0 0 30px;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    font-size: 2rem;
+
+    letter-spacing: 0.03em;
+}
+
+
+.about p {
+    color: var(--muted);
+}
+
+
+.about strong {
+    color: var(--text);
+}
+
+
+/* ---------------------------------------------------------
+   Contact
+   --------------------------------------------------------- */
+
+.contact {
+    min-height: 330px;
+}
+
+
+.contact p:not(.section-label) {
+    color: var(--muted);
+}
+
+
+.contact a {
+    display: inline-block;
+
+    margin-top: 8px;
+
+    font-size: 1.05rem;
+}
+
+
+/* ---------------------------------------------------------
+   Footer
+   --------------------------------------------------------- */
+
+footer {
+    max-width: var(--max-width);
+
+    margin: 0 auto;
+    padding: 35px 30px 50px;
+
+    display: flex;
+    justify-content: space-between;
+
+    color: var(--muted);
+
+    font-size: 0.68rem;
+}
+
+
+.footer-classification {
+    color: var(--accent);
+
+    letter-spacing: 0.14em;
+}
+
+
+/* ---------------------------------------------------------
+   Responsive
+   --------------------------------------------------------- */
+
+@media (max-width: 750px) {
+
+    .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 24px;
+    }
+
+
+    .tagline {
+        margin: 0;
+    }
+
+
+    .hero {
+        min-height: auto;
+
+        padding: 75px 0;
+    }
+
+
+    .game-title h2 {
+        font-size: clamp(2.5rem, 13vw, 4.5rem);
+    }
+
+
+    .intel-strip {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+
+    .intel-strip div:nth-child(2) {
+        border-right: none;
+    }
+
+
+    .intel-strip div:nth-child(-n+2) {
+        border-bottom: 1px solid var(--border);
+    }
+
+
+    footer {
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+}
+
+
+@media (max-width: 460px) {
+
+    .brand h1 {
+        font-size: 1.15rem;
+    }
+
+
+    .placeholder-logo {
+        width: 55px;
+        height: 55px;
+    }
+
+
+    .intel-strip {
+        grid-template-columns: 1fr;
+    }
+
+
+    .intel-strip div {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+
+    .intel-strip div:last-child {
+        border-bottom: none;
+    }
+
+}
