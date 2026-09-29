@@ -549,10 +549,19 @@ footer {
    --------------------------------------------------------- */
 
 @media (max-width: 750px) {
+.feedback-actions {
+    flex-direction: column;
+}
+
+
+.feedback-button {
+    width: 100%;
+}
 .playtest-header {
     align-items: flex-start;
     flex-direction: column;
 }
+
 
 
 .build-info {
@@ -645,4 +654,42 @@ footer {
         border-bottom: none;
     }
 
+}
+/* ---------------------------------------------------------
+   Playtest Feedback
+   --------------------------------------------------------- */
+
+.feedback-actions {
+    display: flex;
+    gap: 18px;
+
+    margin-top: 18px;
+}
+
+
+.feedback-button {
+    min-width: 230px;
+
+    padding: 13px 22px;
+
+    border: 1px solid var(--border);
+
+    color: var(--muted);
+
+    font-size: 0.68rem;
+    font-weight: bold;
+
+    letter-spacing: 0.12em;
+
+    text-align: center;
+
+    transition:
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.feedback-button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
 }
