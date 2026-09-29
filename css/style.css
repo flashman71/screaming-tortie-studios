@@ -293,6 +293,170 @@ main {
 
 
 /* ---------------------------------------------------------
+   Playtest
+   --------------------------------------------------------- */
+
+.playtest {
+    padding: 100px 0;
+
+    border-bottom: 1px solid var(--border);
+}
+
+
+.playtest-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    gap: 30px;
+}
+
+
+.playtest-header h2 {
+    margin: 4px 0 0;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    font-size: clamp(2.3rem, 5vw, 4.5rem);
+    font-weight: 900;
+
+    line-height: 1;
+
+    letter-spacing: -0.035em;
+}
+
+
+.playtest-badge {
+    padding: 9px 13px;
+
+    border: 1px solid var(--accent);
+
+    color: var(--accent);
+
+    font-size: 0.65rem;
+    font-weight: bold;
+
+    letter-spacing: 0.16em;
+
+    white-space: nowrap;
+}
+
+
+.playtest-intro {
+    max-width: 680px;
+
+    margin: 35px 0;
+
+    color: var(--muted);
+
+    font-size: 0.95rem;
+}
+
+
+.build-info {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+
+    margin: 40px 0;
+
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+
+.build-info div {
+    padding: 20px;
+
+    border-right: 1px solid var(--border);
+
+    font-size: 0.75rem;
+}
+
+
+.build-info div:last-child {
+    border-right: none;
+}
+
+
+.build-info span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--muted);
+
+    font-size: 0.6rem;
+
+    letter-spacing: 0.15em;
+}
+
+
+.download-buttons {
+    display: flex;
+
+    gap: 18px;
+
+    margin-top: 35px;
+}
+
+
+.download-button {
+    min-width: 230px;
+
+    padding: 18px 22px;
+
+    border: 1px solid var(--accent);
+
+    color: var(--text);
+
+    font-size: 0.78rem;
+    font-weight: bold;
+
+    letter-spacing: 0.08em;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.download-button:hover {
+    background: var(--accent);
+
+    color: var(--background);
+
+    border-color: var(--accent);
+}
+
+
+.download-platform {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: var(--accent);
+
+    font-size: 0.6rem;
+
+    letter-spacing: 0.2em;
+}
+
+
+.download-button:hover .download-platform {
+    color: var(--background);
+}
+
+
+.playtest-note {
+    margin-top: 28px;
+
+    color: var(--muted);
+
+    font-size: 0.65rem;
+
+    letter-spacing: 0.08em;
+}
+/* ---------------------------------------------------------
    About
    --------------------------------------------------------- */
 
@@ -385,7 +549,25 @@ footer {
    --------------------------------------------------------- */
 
 @media (max-width: 750px) {
+.playtest-header {
+    align-items: flex-start;
+    flex-direction: column;
+}
 
+
+.build-info {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+
+.download-buttons {
+    flex-direction: column;
+}
+
+
+.download-button {
+    width: 100%;
+}
     .site-header {
         align-items: flex-start;
         flex-direction: column;
