@@ -106,11 +106,10 @@
         on Windows and Linux.
     </p>
 
-    <div class="build-info">
-<div class="build-info">
+    <div class="build-info" id="build-info">
     <div>
         <span>BUILD</span>
-        v0.1.0 PLAYTEST
+        <span id="build-version">v0.1.0 PLAYTEST</span>
     </div>
 
     <div>
@@ -128,26 +127,45 @@
         PRE-RELEASE
     </div>
 </div>
-    </div>
 
     <div class="download-buttons">
-<a
-    class="download-button"
-    href="https://github.com/flashman71/IronVeil/releases/download/v0.1.0-pre.20260927-2013/IronVeil_v0.1.0_20260927-2014_windows.zip"
->
-    <span class="download-platform">WINDOWS</span>
-    DOWNLOAD PLAYTEST
-</a>
+        <a
+            class="download-button"
+            id="windows-download"
+            href="https://github.com/flashman71/IronVeil/releases/latest"
+        >
+            <span class="download-platform">WINDOWS</span>
+            DOWNLOAD PLAYTEST
+        </a>
 
-<a
-    class="download-button"
-    href="https://github.com/flashman71/IronVeil/releases/download/v0.1.0-pre.20260927-2013/IronVeil_v0.1.0_20260927-2013_linux.zip"
->
-    <span class="download-platform">LINUX</span>
-    DOWNLOAD PLAYTEST
-</a>
-
+        <a
+            class="download-button"
+            id="linux-download"
+            href="https://github.com/flashman71/IronVeil/releases/latest"
+        >
+            <span class="download-platform">LINUX</span>
+            DOWNLOAD PLAYTEST
+        </a>
     </div>
+
+    <div class="download-stats" aria-live="polite">
+        <div>
+            <span class="download-count" id="windows-downloads">--</span>
+            <span class="download-count-label">WINDOWS DOWNLOADS</span>
+        </div>
+        <div>
+            <span class="download-count" id="linux-downloads">--</span>
+            <span class="download-count-label">LINUX DOWNLOADS</span>
+        </div>
+        <div>
+            <span class="download-count" id="total-downloads">--</span>
+            <span class="download-count-label">TOTAL DOWNLOADS</span>
+        </div>
+    </div>
+
+    <p class="download-stats-note" id="download-stats-note">
+        RELEASE TELEMETRY // Loading GitHub release data…
+    </p>
 <div class="feedback-actions">
 
     <a
@@ -229,6 +247,75 @@
     </p>
 
 </footer>
+
+<script>
+(() => {
+    const owner = "flashman71";
+    const repo = "IronVeil";
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases`;
+    const releasesUrl = `https://github.com/${owner}/${repo}/releases/latest`;
+
+    const windowsLink = document.getElementById("windows-download");
+    const linuxLink = document.getElementById("linux-download");
+    const windowsCount = document.getElementById("windows-downloads");
+    const linuxCount = document.getElementById("linux-downloads");
+    const totalCount = document.getElementById("total-downloads");
+    const buildVersion = document.getElementById("build-version");
+    const statsNote = document.getElementById("download-stats-note");
+
+    const classifyAsset = (name) => {
+        const lower = name.toLowerCase();
+        if (lower.endsWith(".zip") && lower.includes("windows")) return "windows";
+        if (lower.endsWith(".zip") && lower.includes("linux")) return "linux";
+        return null;
+    };
+
+    const formatCount = (count) => new Intl.NumberFormat().format(count);
+
+    fetch(apiUrl, { headers: { "Accept": "application/vnd.github+json" } })
+        .then((response) => {
+            if (!response.ok) throw new Error(`GitHub API returned ${response.status}`);
+            return response.json();
+        })
+        .then((releases) => {
+            let windowsDownloads = 0;
+            let linuxDownloads = 0;
+
+            for (const release of releases) {
+                for (const asset of release.assets || []) {
+                    const platform = classifyAsset(asset.name);
+                    if (platform === "windows") windowsDownloads += asset.download_count;
+                    if (platform === "linux") linuxDownloads += asset.download_count;
+                }
+            }
+
+            const latestRelease = releases.find((release) => !release.draft);
+            if (latestRelease) {
+                buildVersion.textContent = `${latestRelease.tag_name} PLAYTEST`;
+
+                for (const asset of latestRelease.assets || []) {
+                    const platform = classifyAsset(asset.name);
+                    if (platform === "windows") windowsLink.href = asset.browser_download_url;
+                    if (platform === "linux") linuxLink.href = asset.browser_download_url;
+                }
+            }
+
+            windowsCount.textContent = formatCount(windowsDownloads);
+            linuxCount.textContent = formatCount(linuxDownloads);
+            totalCount.textContent = formatCount(windowsDownloads + linuxDownloads);
+            statsNote.textContent = "RELEASE TELEMETRY // Cumulative GitHub release-asset downloads";
+        })
+        .catch((error) => {
+            console.error("Unable to load Iron Veil release data:", error);
+            windowsLink.href = releasesUrl;
+            linuxLink.href = releasesUrl;
+            windowsCount.textContent = "—";
+            linuxCount.textContent = "—";
+            totalCount.textContent = "—";
+            statsNote.textContent = "RELEASE TELEMETRY // Stats temporarily unavailable";
+        });
+})();
+</script>
 
 </body>
 </html>

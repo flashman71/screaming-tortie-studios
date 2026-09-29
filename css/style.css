@@ -693,3 +693,75 @@ footer {
     border-color: var(--accent);
     color: var(--accent);
 }
+
+/* ---------------------------------------------------------
+   Release download telemetry
+   --------------------------------------------------------- */
+
+.download-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    margin-top: 28px;
+
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.download-stats > div {
+    padding: 20px;
+
+    border-right: 1px solid var(--border);
+
+    text-align: center;
+}
+
+.download-stats > div:last-child {
+    border-right: none;
+}
+
+.download-count,
+.download-count-label {
+    display: block;
+}
+
+.download-count {
+    color: var(--text);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+}
+
+.download-count-label {
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+}
+
+.download-stats-note {
+    margin: 10px 0 0;
+
+    color: var(--muted);
+
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+}
+
+@media (max-width: 600px) {
+    .download-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .download-stats > div {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .download-stats > div:last-child {
+        border-bottom: none;
+    }
+}
