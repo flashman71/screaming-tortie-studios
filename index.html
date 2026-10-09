@@ -291,7 +291,9 @@
 
             const latestRelease = releases.find((release) => !release.draft);
             if (latestRelease) {
-                buildVersion.textContent = `${latestRelease.tag_name} PLAYTEST`;
+                if (buildVersion) {
+                                     buildVersion.textContent = `${latestRelease.tag_name} PLAYTEST`;
+                                  }
 
                 for (const asset of latestRelease.assets || []) {
                     const platform = classifyAsset(asset.name);
@@ -307,12 +309,18 @@
         })
         .catch((error) => {
             console.error("Unable to load Iron Veil release data:", error);
-            windowsLink.href = releasesUrl;
-            linuxLink.href = releasesUrl;
-            windowsCount.textContent = "—";
-            linuxCount.textContent = "—";
-            totalCount.textContent = "—";
-            statsNote.textContent = "RELEASE TELEMETRY // Stats temporarily unavailable";
+
+            if (windowsLink) windowsLink.href = releasesUrl;
+            if (linuxLink) linuxLink.href = releasesUrl;
+
+            if (windowsCount) windowsCount.textContent = "—";
+            if (linuxCount) linuxCount.textContent = "—";
+            if (totalCount) totalCount.textContent = "—";
+
+            if (statsNote) {
+                statsNote.textContent =
+                    "RELEASE TELEMETRY // Stats temporarily unavailable";
+            }
         });
 })();
 </script>
