@@ -12,6 +12,26 @@
     >
 
     <link rel="stylesheet" href="css/style.css">
+    <style>
+      /* Feedback dialog additions; existing site CSS remains unchanged. */
+      .iv-dialog { border:1px solid #7d846c; border-radius:8px; background:#151c20; color:#f2f0e8; width:min(92vw,650px); max-height:90vh; overflow:auto; padding:clamp(18px,4vw,32px); box-shadow:0 20px 65px #000a; }
+      .iv-dialog::backdrop { background:rgba(0,0,0,.78); }
+      .iv-dialog h2 { color:#e3d9ad; margin:0 0 12px; }
+      .iv-dialog label { display:block; margin:14px 0 5px; font-weight:600; }
+      .iv-dialog input:not([type=checkbox]),.iv-dialog select,.iv-dialog textarea { box-sizing:border-box; width:100%; padding:11px; color:#f4f1e9; background:#263037; border:1px solid #88938d; border-radius:4px; font:inherit; }
+      .iv-dialog textarea { min-height:135px; resize:vertical; }
+      .iv-dialog .iv-checkbox { display:flex; gap:9px; align-items:flex-start; font-weight:400; }
+      .iv-dialog .iv-checkbox input { margin-top:5px; }
+      .iv-dialog .iv-muted { color:#c5ccc8; font-size:.9rem; line-height:1.5; }
+      .iv-dialog .iv-actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; }
+      .iv-dialog button { cursor:pointer; padding:11px 18px; border-radius:4px; border:1px solid #aab2a6; background:#33473d; color:white; font:inherit; }
+      .iv-dialog button:disabled { opacity:.55; cursor:wait; }
+      .iv-dialog button[type=button] { background:transparent; }
+      .iv-dialog a { color:#d6e9d7; }
+      .iv-dialog .iv-status { margin-top:12px; min-height:1.5em; }
+      .feedback-actions button.feedback-button { font:inherit; cursor:pointer; }
+    </style>
+
 </head>
 
 <body>
@@ -167,26 +187,10 @@
         RELEASE TELEMETRY // Loading GitHub release data…
     </p>
 <div class="feedback-actions">
-
-    <a
-        class="feedback-button"
-        href="https://github.com/flashman71/IronVeil-Releases/issues/new?template=bug_report.yml"
-        target="_blank"
-        rel="noopener noreferrer"
-    >
-        REPORT A BUG
-    </a>
-
-    <a
-        class="feedback-button"
-        href="https://github.com/flashman71/IronVeil-Releases/issues/new?template=feedback.yml"
-        target="_blank"
-        rel="noopener noreferrer"
-    >
-        PLAYTEST FEEDBACK
-    </a>
-
+    <button type="button" class="feedback-button" data-report-type="bug">REPORT A BUG</button>
+    <button type="button" class="feedback-button" data-report-type="feedback">PLAYTEST FEEDBACK</button>
 </div>
+<p class="playtest-note">NO GITHUB LOGIN REQUIRED // Reports are public; optional contact emails are private.</p>
 
     <p class="playtest-note">
         PRE-RELEASE SOFTWARE // Features, content, and saved-game
@@ -234,6 +238,33 @@
     </section>
 
 </main>
+
+<!-- Anonymous report form; email is sent separately to the Worker, never to GitHub. -->
+<dialog id="iv-report-dialog" class="iv-dialog" aria-labelledby="iv-report-heading">
+  <h2 id="iv-report-heading">TRANSMIT INTELLIGENCE</h2>
+  <p class="iv-muted">No GitHub account required. Your report title, description and game details will be published as a public GitHub issue. Do not include private information in those fields.</p>
+  <form id="iv-report-form">
+    <label for="iv-title">Report title *</label>
+    <input id="iv-title" name="title" maxlength="150" required placeholder="Brief summary">
+    <label for="iv-description">Description *</label>
+    <textarea id="iv-description" name="description" maxlength="10000" required placeholder="For bugs: what happened, and how can we reproduce it?"></textarea>
+    <label for="iv-version">Game version</label>
+    <input id="iv-version" name="version" maxlength="100" value="v0.2.1">
+    <label for="iv-platform">Platform</label>
+    <select id="iv-platform" name="platform"><option value="">Not specified</option><option>Linux</option><option>Windows</option><option>Other</option></select>
+    <label for="iv-mission">Mission</label>
+    <select id="iv-mission" name="mission"><option value="">Not specified</option><option>Mission 1</option><option>Mission 2</option><option>Mission 3</option><option>Menus / Saves / General</option></select>
+    <label for="iv-email">Contact email (optional, not public)</label>
+    <input id="iv-email" name="email" type="email" maxlength="254" autocomplete="email" placeholder="tester@example.com">
+    <label class="iv-checkbox" for="iv-consent"><input id="iv-consent" name="consent" type="checkbox"> I consent to Screaming Tortie Studios storing my email privately to contact me about this report.</label>
+    <p class="iv-muted">Contact emails are stored separately in private Cloudflare D1, linked to the issue number. Leave the email blank if you don't want follow-up. Public reports remain visible on GitHub.</p>
+    <div id="iv-turnstile"></div>
+    <div class="iv-actions"><button id="iv-submit" type="submit">SUBMIT REPORT</button><button id="iv-cancel" type="button">CANCEL</button></div>
+    <p id="iv-status" class="iv-status" role="status" aria-live="polite"></p>
+    <p class="iv-muted">Prefer GitHub? <a id="iv-github-alternative" href="https://github.com/flashman71/IronVeil-Releases/issues/new?template=bug_report.yml" target="_blank" rel="noopener noreferrer">Use the GitHub issue form</a>.</p>
+  </form>
+</dialog>
+
 
 
 <footer>
@@ -324,6 +355,115 @@
         });
 })();
 </script>
+
+
+<script>
+(() => {
+  "use strict";
+  const API_URL = "https://ironveil-feedback-api.flashman.workers.dev";
+  // Replace with your PUBLIC Turnstile SITE KEY (never the secret key).
+  const TURNSTILE_SITE_KEY = "0x4AAAAAAFSz9vmX4r5sQZ8k";
+  const dialog = document.getElementById("iv-report-dialog");
+  const form = document.getElementById("iv-report-form");
+  const status = document.getElementById("iv-status");
+  const submit = document.getElementById("iv-submit");
+  const email = document.getElementById("iv-email");
+  const consent = document.getElementById("iv-consent");
+  let reportType = "bug";
+  let widgetId = null;
+
+  function showStatus(message) { status.textContent = message; }
+  function loadTurnstile() {
+    if (TURNSTILE_SITE_KEY === "REPLACE_WITH_TURNSTILE_SITE_KEY") {
+      showStatus("Site configuration incomplete: add the Turnstile site key to index.html.");
+      return;
+    }
+    if (widgetId !== null) { window.turnstile?.reset(widgetId); return; }
+    if (!window.turnstile) {
+      showStatus("Verification is loading. Please try again shortly.");
+      return;
+    }
+    widgetId = window.turnstile.render("#iv-turnstile", {
+      sitekey: TURNSTILE_SITE_KEY,
+      action: "feedback_submit",
+      theme: "dark",
+      "expired-callback": () => showStatus("Verification expired. Please verify again."),
+      "error-callback": () => showStatus("Verification unavailable. Please try again.")
+    });
+  }
+  window.ivTurnstileReady = () => {
+    if (dialog.open) loadTurnstile();
+  };
+  document.querySelectorAll("[data-report-type]").forEach(button => {
+    button.addEventListener("click", () => {
+      reportType = button.dataset.reportType;
+      form.reset();
+      document.getElementById("iv-report-heading").textContent =
+        reportType === "bug" ? "REPORT A BUG" : "PLAYTEST FEEDBACK";
+      document.getElementById("iv-github-alternative").href =
+        `https://github.com/flashman71/IronVeil-Releases/issues/new?template=${reportType === "bug" ? "bug_report.yml" : "feedback.yml"}`;
+      showStatus("");
+      dialog.showModal();
+      loadTurnstile();
+    });
+  });
+  document.getElementById("iv-cancel").addEventListener("click", () => dialog.close());
+  dialog.addEventListener("close", () => { if (widgetId !== null) window.turnstile?.reset(widgetId); });
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    if (email.value.trim() && !consent.checked) {
+      showStatus("Please consent to follow-up contact or leave the email blank.");
+      return;
+    }
+    const token = widgetId !== null ? window.turnstile?.getResponse(widgetId) : "";
+    if (!token) { showStatus("Complete the verification before submitting."); return; }
+    submit.disabled = true;
+    showStatus("Transmitting report…");
+    try {
+      const payload = {
+        type: reportType,
+        title: document.getElementById("iv-title").value.trim(),
+        description: document.getElementById("iv-description").value.trim(),
+        version: document.getElementById("iv-version").value.trim(),
+        platform: document.getElementById("iv-platform").value,
+        mission: document.getElementById("iv-mission").value,
+        email: email.value.trim(),
+        consent: consent.checked,
+        turnstileToken: token
+      };
+      const response = await fetch(API_URL, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) throw new Error(result.error || "Submission failed");
+      const issueNumber = Number(result.issueNumber);
+      showStatus(`Report submitted as GitHub issue #${issueNumber}.` +
+        (payload.email && !result.contactSaved
+          ? " WARNING: Your email could not be saved; please contact the studio separately for follow-up."
+          : payload.email ? " Your contact email was saved privately." : ""));
+      // Only use the known GitHub repository and numeric issue ID to build the link.
+      const link = document.createElement("a");
+      link.href = `https://github.com/flashman71/IronVeil-Releases/issues/${issueNumber}`;
+      link.textContent = " View public issue";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      status.append(link);
+      form.querySelectorAll("input,textarea,select").forEach(field => field.disabled = true);
+      submit.hidden = true;
+    } catch (error) {
+      showStatus(`Unable to submit report: ${error.message}. Please try again.`);
+      if (widgetId !== null) window.turnstile?.reset(widgetId);
+    } finally { submit.disabled = false; }
+  });
+  dialog.addEventListener("close", () => {
+    form.querySelectorAll("input,textarea,select").forEach(field => field.disabled = false);
+    submit.hidden = false;
+  });
+})();
+</script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=ivTurnstileReady&render=explicit" async defer></script>
 
 </body>
 </html>
